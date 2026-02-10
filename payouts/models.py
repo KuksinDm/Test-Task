@@ -39,7 +39,7 @@ class Payout(models.Model):
         verbose_name_plural = "Payouts"
         constraints = [
             models.CheckConstraint(
-                check=models.Q(amount__gt=0),
+                condition=models.Q(amount__gt=0),
                 name="payout_amount_gt_zero",
             ),
         ]

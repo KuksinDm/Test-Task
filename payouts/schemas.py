@@ -26,6 +26,7 @@ PAYOUTS_SCHEMA = extend_schema_view(
         request=PayoutCreateSerializer,
         responses={201: PayoutReadSerializer},
     ),
+    update=extend_schema(exclude=True),
     partial_update=extend_schema(
         tags=["Payouts"],
         summary="Обновить статус заявки",

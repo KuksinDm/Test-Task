@@ -1,3 +1,4 @@
+import logging
 import time
 
 from celery import shared_task
@@ -5,6 +6,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import Payout
+
+logger = logging.getLogger("celery")
 
 
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3)
@@ -21,6 +24,7 @@ def process_payout_task(self, payout_id: int) -> None:
             payout.status = Payout.Status.PROCESSING
             payout.save(update_fields=["status", "updated_at"])
     except Payout.DoesNotExist:
+        logger.warning("Payout not found", extra={"payout_id": payout_id})
         return
 
     # Имитация обработки
@@ -38,3 +42,4 @@ def process_payout_task(self, payout_id: int) -> None:
         payout.save(
             update_fields=["status", "processed_at", "error_message", "updated_at"]
         )
+    logger.info("Payout processed", extra={"payout_id": payout_id})

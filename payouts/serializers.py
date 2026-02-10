@@ -35,13 +35,21 @@ class PayoutCreateSerializer(serializers.ModelSerializer):
 class PayoutUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payout
-        fields = ("status",)
+        fields = ("status", "description", "recipient_details")
+        extra_kwargs = {
+            "description": {"required": False, "allow_blank": True},
+            "recipient_details": {"required": False},
+            "status": {"required": False},
+        }
 
     def validate_status(self, value: str) -> str:
         instance = self.instance
         if instance:
             validate_status_transition(instance.status, value)
         return value
+
+    def validate_recipient_details(self, value: str) -> str:
+        return validate_recipient_details(value)
 
 
 class PayoutReadSerializer(serializers.ModelSerializer):

@@ -34,11 +34,19 @@ class PayoutViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
+        if not partial:
+            return Response(
+                {"detail": "Method \"PUT\" not allowed."},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        payout = PayoutService.update_status(
-            instance, serializer.validated_data["status"]
+        payout = PayoutService.update_payout(
+            instance,
+            status=serializer.validated_data.get("status"),
+            description=serializer.validated_data.get("description"),
+            recipient_details=serializer.validated_data.get("recipient_details"),
         )
         read_serializer = PayoutReadSerializer(
             payout, context=self.get_serializer_context()

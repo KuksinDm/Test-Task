@@ -21,6 +21,7 @@ services:
       test_db:
         condition: service_healthy
     command: ["web"]
+    ports: ["8000:8000"]
     volumes:
       - ./logs:/app/logs
       - staticfiles_test_task:/app/staticfiles
